@@ -1,0 +1,80 @@
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: wazuh-manager-master
+  namespace: wazuh
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 3Gi
+  hostPath:
+    path: /data/test
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wazuh-manager-master
+  namespace: wazuh
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: wazuh-manager-worker
+  namespace: wazuh
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 3Gi
+  hostPath:
+    path: /data/test
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wazuh-manager-worker
+  namespace: wazuh
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
+---
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: wazuh-manager-worker
+  namespace: wazuh
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 3Gi
+  hostPath:
+    path: /data/test
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wazuh-manager-worker
+  namespace: wazuh
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi

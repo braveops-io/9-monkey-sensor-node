@@ -1,0 +1,58 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: wazuh-agent
+  namespace: wazuh
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wazuh-agent
+  template:
+    metadata:
+      labels:
+        app: wazuh-agent
+      name: wazuh-agent
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: agent-ossec.conf
+        - name: host-etc
+          hostPath:
+            # directory location on host
+            path: /etc
+            # this field is optional
+            type: Directory
+        - name: host-bin
+          hostPath:
+            # directory location on host
+            path: /bin
+            # this field is optional
+            type: Directory
+        - name: host-ossec-scripts
+          hostPath:
+            # directory location on host
+            path: /var/ossec-scripts
+            # this field is optional
+    
+      containers:
+        - name: wazuh-agent
+          image: 'mattiashem/wazuh-agent'
+          securityContext:
+            privileged: true
+          resources:
+            requests:
+              cpu: 200m
+            limits:
+              cpu: 300m
+          volumeMounts:
+            - name: config
+              mountPath: /var/ossec/etc/ossec.conf
+              subPath: ossec.conf
+            - name: host-etc
+              mountPath: /hostfs/etc
+            - name: host-bin
+              mountPath: /hostfs/bin
+            - name: host-ossec-scripts
+              mountPath: /hostfs/ossec-scripts

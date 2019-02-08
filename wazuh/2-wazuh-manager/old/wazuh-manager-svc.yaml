@@ -1,0 +1,28 @@
+#######################################################################
+# Service to expose Wazuh managers agents communication ports to other
+# EC2 instances in the VPC
+#
+# All managers (the master and clients) are behind that load balancer,
+# so agents are going to report to any manager they want, all that
+# without stickiness
+#######################################################################
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: wazuh-manager
+  namespace: wazuh
+  labels:
+    app: wazuh-manager
+spec:
+  selector:
+    app: wazuh-manager
+  ports:
+    - name: agents-events
+      protocol: TCP
+      port: 1514
+      targetPort: 1514
+    - name: agents-auth
+      protocol: TCP
+      port: 1515
+      targetPort: 1515

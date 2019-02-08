@@ -1,0 +1,65 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: elasticsearch
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+        resources:
+          requests:
+            cpu: 500m
+          limits:
+            cpu: 1
+        env:
+        - name: discovery.type
+          value: "single-node"
+        ports:
+        - containerPort: 9200
+          name: elasticsearch
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9200
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /_cluster/health
+            port: 9200
+          initialDelaySeconds: 60
+          periodSeconds: 30
+
+
+#        volumeMounts:
+#        - name: elasticsearch-storage
+#          mountPath: /var/share/elasticsearch/data
+#      volumes:
+#      - name: elasticsearch-storage
+#        persistentVolumeClaim:
+#          claimName: elasticsearch-storage-pv-claim
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: elasticsearch
+  name: elasticsearch
+spec:
+  selector:
+    app: elasticsearch
+  type: ClusterIP
+  ports:
+  - name: elasticsearch
+    protocol: TCP
+    port: 9200
+    

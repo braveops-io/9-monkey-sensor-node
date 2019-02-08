@@ -1,0 +1,84 @@
+#######################################################################
+# Kubernetes StatefulSet for the Wazuh manager master node
+#
+# We deploy only one replica here because Wazuh is not yet supporting
+# a multi-master setup
+#######################################################################
+
+apiVersion: apps/v1beta2
+kind: StatefulSet
+metadata:
+  name: wazuh-manager-master
+  namespace: wazuh
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wazuh-manager
+      wazuh-manager-role: master
+  serviceName: wazuh-master
+  podManagementPolicy: Parallel
+  template:
+    metadata:
+      labels:
+        app: wazuh-manager
+        wazuh-manager-role: master
+      name: wazuh-manager-master
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: wazuh-manager-master-conf
+        - name: wazuh-manager-master
+          persistentVolumeClaim:
+            claimName: wazuh-manager-master
+      containers:
+        - name: wazuh-manager
+          image: 'wazuh/wazuh'
+          resources:
+            requests:
+              cpu: 500m
+              memory: 256Mi
+            limits:
+              cpu: 1
+              memory: 512Mi
+          volumeMounts:
+            - name: config
+              mountPath: /wazuh-config-mount/etc/ossec.conf
+              subPath: ossec.conf
+              readOnly: true
+            - name: wazuh-manager-master
+              mountPath: /var/ossec/data
+            - name: wazuh-manager-master
+              mountPath: /etc/postfix
+          ports:
+            - containerPort: 1514
+            - containerPort: 1515
+            - containerPort: 1516
+            - containerPort: 55000
+
+
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: wazuh-manager-master
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 3Gi
+  hostPath:
+    path: /data/test
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wazuh-manager-master
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 3Gi
