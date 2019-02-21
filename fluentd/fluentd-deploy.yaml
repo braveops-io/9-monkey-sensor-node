@@ -1,0 +1,55 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: fluentd
+  namespace: logging
+  labels:
+    k8s-app: fluentd
+    app: fluentd
+spec:
+  template:
+    metadata:
+      labels:
+        k8s-app: fluentd
+        app: fluentd
+
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "2020"
+        prometheus.io/path: /api/v1/metrics/prometheus
+    spec:
+      containers:
+      - name: fluentd
+        image: quay.io/fluent/fluentd-kubernetes-daemonset
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 24224
+        volumeMounts:
+        - name: fluentd-config
+          mountPath: /fluentd/etc/
+        env:
+        - name: FLUENT_ELASTICSEARCH_HOST
+          value: "elasticsearch.default.svc"
+        - name: FLUENT_ELASTICSEARCH_PORT
+          value: "9200"    
+      terminationGracePeriodSeconds: 10
+      volumes:
+      - name: fluentd-config
+        configMap:
+          name: fluentd-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    name: fluentd
+  name: fluentd
+spec:
+  selector:
+    app: fluentd
+  type: ClusterIP
+  ports:
+  - name: forward
+    protocol: TCP
+    targetPort: 24224
+    port: 24224

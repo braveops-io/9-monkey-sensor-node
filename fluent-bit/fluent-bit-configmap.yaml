@@ -19,6 +19,7 @@ data:
         HTTP_Port     2020
 
     @INCLUDE input-kubernetes.conf
+    @INCLUDE input-syslog.conf
     @INCLUDE filter-kubernetes.conf
     @INCLUDE output-fluentd.conf
 
@@ -32,7 +33,79 @@ data:
         Mem_Buf_Limit     5MB
         Skip_Long_Lines   On
         Refresh_Interval  10
+  input-syslog.conf: |
+    [INPUT]
+        Name    tail
+        Path    /var/log/messages
+        Tag     syslog.messages.*
+        DB      /var/log/syslog-messages.db
+        Parser  syslog
+        Key     messages
+    [INPUT]
+        Name    tail
+        Path    /var/log/secure
+        Tag     syslog.secure.*
+        DB      /var/log/syslog.secure.db
+        Parser  syslog
+        Key     secure
+    [INPUT]
+        Name    tail
+        Path    /var/log/yum.log
+        Tag     syslog.yum.*
+        DB      /var/log/syslog.yum.db
+        Parser  syslog
+        Key     yum
+    [INPUT]
+        Name    tail
+        Path    /var/log/audit/audit.log
+        Tag     syslog.audit.*
+        DB      /var/log/syslog.auditcd.db
+        Parser  syslog
+        Key     audit
+    [INPUT]
+        Name    tail
+        Path    /var/log/cron
+        Tag     syslog.cron.*
+        DB      /var/log/syslog.cron.db
+        Parser  syslog
+        Key     cron
+    [INPUT]
+        Name    tail
+        Path    /var/log/maillog
+        Tag     syslog.maillog.*
+        DB      /var/log/syslog.maillog.db
+        Parser  syslog
+        Key     maillog
+    [INPUT]
+        Name    tail
+        Path    /var/log/cfn-*.log
+        Tag     syslog.cfn.*
+        DB      /var/log/syslog.cfn-init.db
+        Parser  syslog
+        Key     cfn
+    [INPUT]
+        Name    tail
+        Path    /var/log/aws-routed-eni/*
+        Tag     syslog.aws.*
+        DB      /var/syslog.aws-routed-eni.db
+        Parser  syslog
+        Key     aws
+    [INPUT]
+        Name    tail
+        Path    /var/log/cloud-init.log
+        Tag     syslog.cloud.*
+        DB      /var/syslog.cloud-init.db
+        Parser  syslog
+        Key     cloud
+    [INPUT]
+        Name    tail
+        Path    /var/log/cloud-init-output.log
+        Tag     syslog.cloud.*
+        DB      /var/syslog.cloud-init-output.db
+        Parser  syslog
+        Key     cloudour
 
+        
   filter-kubernetes.conf: |
     [FILTER]
         Name                kubernetes
