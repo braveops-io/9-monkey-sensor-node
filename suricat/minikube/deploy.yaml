@@ -1,0 +1,57 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: filebeat-send-config
+  namespace: wazuh
+data:
+  filebeat.yml: |-
+        filebeat.config:
+          modules:
+            path: /var/alerts/eve.json
+            reload.enabled: false
+        output.logstash:
+          hosts: ["suricat-logstash:5044"]
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: suricat-sensor
+  namespace: wazuh
+spec:
+  selector:
+    matchLabels:
+      app: suricat-sensor
+  template:
+    metadata:
+      labels:
+        app: suricat-sensor
+      name: suricat-sensor
+    spec:
+      volumes:
+        - name: log-data
+          emptyDir: {}
+        - name: filebeat-send-config
+          configMap:
+            name: filebeat-send-config
+      containers:
+        - name: suricat-sensor
+          image: 'mattiashem/suricat-sensor'
+          securityContext:
+            privileged: true
+          resources:
+            requests:
+              cpu: 200m
+            limits:
+              cpu: 300m
+          volumeMounts:
+            - name: log-data
+              mountPath: /var/alerts
+        - name: filebeat-sender
+          image: 'docker.elastic.co/beats/filebeat:6.6.0'
+          volumeMounts:
+            - name: log-data
+              mountPath: /var/alerts
+            - name: filebeat-send-config
+              mountPath: /usr/share/filebeat/filebeat.yml
+              subPath: filebeat.yml
+                         
