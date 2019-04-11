@@ -16,6 +16,12 @@ data:
     #       ssl_certificate => "/etc/logstash/logstash.crt"
     #       ssl_key => "/etc/logstash/logstash.key"
         }
+        #Suricat logstash input
+        beats {
+            port => 5044
+            tags => ['suricat','nids','network']
+
+        }
     }
     filter {
         if [data][srcip] {

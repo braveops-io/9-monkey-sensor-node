@@ -9,7 +9,7 @@ metadata:
     volume.beta.kubernetes.io/storage-class: "efs"
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 30Gi
@@ -21,15 +21,29 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: wazuh-manager-worker
+  name: wazuh-manager-worker-0
   namespace: wazuh
   annotations:
     volume.beta.kubernetes.io/storage-class: "efs"
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 30Gi
 
-
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: wazuh-manager-worker-1
+  namespace: wazuh
+  annotations:
+    volume.beta.kubernetes.io/storage-class: "efs"
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 30Gi
+---

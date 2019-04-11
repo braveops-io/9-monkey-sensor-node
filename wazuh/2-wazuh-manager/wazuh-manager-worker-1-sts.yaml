@@ -46,9 +46,9 @@ spec:
         - name: config
           configMap:
             name: wazuh-manager-worker-1-conf
-        - name: wazuh-manager-worker
+        - name: wazuh-manager-worker-1
           persistentVolumeClaim:
-            claimName: wazuh-manager-worker
+            claimName: wazuh-manager-worker-1
       containers:
         - name: wazuh-manager
           image: 'wazuh/wazuh:3.8.2_6.5.4'
@@ -62,9 +62,9 @@ spec:
               mountPath: /wazuh-config-mount/etc/ossec.conf
               subPath: ossec.conf
               readOnly: true
-            - name: wazuh-manager-worker
+            - name: wazuh-manager-worker-1
               mountPath: /var/ossec/data
-            - name: wazuh-manager-worker
+            - name: wazuh-manager-worker-1
               mountPath: /etc/postfix
           ports:
             - containerPort: 1514

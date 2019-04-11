@@ -1,6 +1,22 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
+  name: filebeat-send-config
+  namespace: wazuh
+data:
+  filebeat.yml: |-
+        filebeat.config:
+          modules:
+            path: /var/alerts/eve.json
+            reload.enabled: false
+        output.logstash:
+          hosts: ["suricat-logstash:5044"]
+---
+
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
   name: agent-ossec.conf
   namespace: wazuh
 data:
@@ -246,6 +262,27 @@ data:
       <localfile>
         <log_format>syslog</log_format>
         <location>/hostfs/log/ntpstats/*</location>
+      </localfile>
+
+
+      <!-- Suricat logs -->
+
+      <localfile>
+        <log_format>syslog</log_format>
+        <location>/var/alerts/eve.json</location>
+      </localfile>
+
+
+
+      <!---- Adding container files -->
+      <localfile>
+        <log_format>apache</log_format>
+        <location>/hostfs/log/containers/nginx-ingress-controller*</location>
+      </localfile>
+
+      <localfile>
+        <log_format>syslog</log_format>
+        <location>/hostfs/log/containers/*</location>
       </localfile>
 
     </ossec_config>

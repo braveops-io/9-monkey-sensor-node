@@ -64,9 +64,9 @@ spec:
               mountPath: /wazuh-config-mount/etc/ossec.conf
               subPath: ossec.conf
               readOnly: true
-            - name: wazuh-manager-worker
+            - name: wazuh-manager-worker-0
               mountPath: /var/ossec/data
-            - name: wazuh-manager-worker
+            - name: wazuh-manager-worker-0
               mountPath: /etc/postfix
           ports:
             - containerPort: 1514

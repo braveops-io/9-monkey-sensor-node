@@ -13,6 +13,7 @@ spec:
         app: wazuh-agent
       name: wazuh-agent
     spec:
+      #hostNetwork: true
       volumes:
         - name: config
           configMap:
@@ -34,12 +35,26 @@ spec:
             # directory location on host
             path: /var/log
             # this field is optional
+        - name: host-docker-logs
+          hostPath:
+            # directory location on host
+            path: /var/log/pods
+            # this field is optional
         - name: host-ossec-scripts
           hostPath:
             # directory location on host
             path: /var/ossec-scripts
             # this field is optional
-    
+        - name: docker-logs
+          hostPath:
+            # directory location on host
+            path: /var/lib/docker/containers
+            # this field is optional
+        - name: log-data
+          emptyDir: {}
+        - name: filebeat-send-config
+          configMap:
+            name: filebeat-send-config
       containers:
         - name: wazuh-agent
           image: 'mattiashem/wazuh-agent'
@@ -62,5 +77,31 @@ spec:
               mountPath: /hostfs/ossec-scripts
             - name: host-var-log
               mountPath: /hostfs/log
+            - name: log-data
+              mountPath: /var/alerts
+            - name: host-docker-logs
+              mountPath: /var/log/pods
+            - name: docker-logs
+              mountPath: /var/lib/docker/containers
+        - name: suricat-sensor
+          image: 'mattiashem/suricat-sensor'
+          securityContext:
+            privileged: true
+          resources:
+            requests:
+              cpu: 200m
+            limits:
+              cpu: 300m
+          volumeMounts:
+            - name: log-data
+              mountPath: /var/alerts
+        - name: filebeat-sender
+          image: 'docker.elastic.co/beats/filebeat:6.6.0'
+          volumeMounts:
+            - name: log-data
+              mountPath: /var/alerts
+            - name: filebeat-send-config
+              mountPath: /usr/share/filebeat/filebeat.yml
+              subPath: filebeat.yml
 
 
